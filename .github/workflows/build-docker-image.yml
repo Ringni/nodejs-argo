@@ -22,6 +22,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      # 新增步骤：将 GitHub 用户名转换为全小写并保存到环境变量中
+      - name: Set lowercase repository owner
+        run: |
+          echo "REPO_OWNER=${OWNER,,}" >> ${GITHUB_ENV}
+        env:
+          OWNER: '${{ github.repository_owner }}'
+
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v4
         with:
@@ -39,7 +46,8 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            ghcr.io/${{ github.repository_owner }}/samsamsam1964:latest
+            # 修改点：在这里使用刚刚生成的全小写环境变量
+            ghcr.io/${{ env.REPO_OWNER }}/samsamsam1964:latest
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.description=HTTP Server
